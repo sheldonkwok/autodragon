@@ -1,50 +1,32 @@
-mod monster;
-use monster::Monster;
+use std::{thread, time};
+
+mod framework;
 
 mod player;
 use player::Player;
 
-mod framework;
-use framework::{gcd, CanFight};
+mod battle;
+use crate::battle::battle::*;
 
-fn battle(p: &mut Player) {
-    println!("New encounter!");
-    let mut m = Monster::new();
-
-    loop {
-        let (monster_dmg_taken, slain) = m.defend(p.attack());
-        println!(
-            "[Player: {}] | [Monster: {}]: Player attacks for {}     ",
-            p.health(),
-            m.health(),
-            monster_dmg_taken
-        );
-
-        if slain {
-            break;
-        }
-
-        gcd();
-        let (player_dmg_taken, _) = p.defend(m.attack());
-
-        println!(
-            "[Player: {}] | [Monster: {}]: Monster attacks for {}    ",
-            p.health(),
-            m.health(),
-            player_dmg_taken
-        );
-
-        gcd();
-    }
-
-    p.gain_exp(1);
+static TIMER: time::Duration = time::Duration::from_secs(1);
+pub fn gcd() {
+    thread::sleep(TIMER);
 }
 
 fn main() {
     let mut p = Player::new();
 
+    let mut b = Battle::new(&mut p);
+
     loop {
-        battle(&mut p);
+        match b.next() {
+            Some(txt) => println!("{}", txt),
+            None => {
+                println!("Battle finished!");
+                b = Battle::new(&mut p);
+            }
+        }
+
         gcd();
     }
 }

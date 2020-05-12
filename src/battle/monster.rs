@@ -8,7 +8,7 @@ pub struct Monster {
 }
 
 impl Monster {
-    pub fn new() -> Monster {
+    pub fn new() -> Self {
         let health = rand::thread_rng().gen_range(10, 100);
         Monster { health, damage: 10 }
     }
