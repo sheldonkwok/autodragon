@@ -4,7 +4,7 @@ mod player;
 use player::Player;
 
 mod battle;
-use crate::battle::battle::*;
+use crate::battle::*;
 
 mod framework;
 use crate::framework::Event;

@@ -1,2 +1,5 @@
-pub mod battle;
-pub mod monster;
+mod battle;
+pub use battle::*;
+
+mod monster;
+pub use monster::*;
