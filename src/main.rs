@@ -1,85 +1,50 @@
-use rand::Rng;
-use std::{thread, time};
+mod monster;
+use monster::Monster;
 
-static TIMER: time::Duration = time::Duration::from_secs(1);
+mod player;
+use player::Player;
 
-trait CanFight {
-    fn attack(&self) -> u64;
-    fn defend(&mut self, damage: u64) -> u64;
-}
+mod framework;
+use framework::{gcd, CanFight};
 
-struct Monster {
-    health: u64,
-    damage: u64,
-}
+fn battle(p: &mut Player) {
+    println!("New encounter!");
+    let mut m = Monster::new();
 
-impl Monster {
-    pub fn new() -> Monster {
-        let health = rand::thread_rng().gen_range(10, 100);
-        Monster { health, damage: 10 }
-    }
-}
+    loop {
+        let (monster_dmg_taken, slain) = m.defend(p.attack());
+        println!(
+            "[Player: {}] | [Monster: {}]: Player attacks for {}     ",
+            p.health(),
+            m.health(),
+            monster_dmg_taken
+        );
 
-impl CanFight for Monster {
-    fn attack(&self) -> u64 {
-        return self.damage;
-    }
-
-    fn defend(&mut self, damage: u64) -> u64 {
-        if damage > self.health {
-            self.health = 0;
-        } else {
-            self.health = self.health - damage;
+        if slain {
+            break;
         }
 
-        return self.health;
-    }
-}
+        gcd();
+        let (player_dmg_taken, _) = p.defend(m.attack());
 
-struct Player {
-    health: u64,
-    strength: u64,
-}
+        println!(
+            "[Player: {}] | [Monster: {}]: Monster attacks for {}    ",
+            p.health(),
+            m.health(),
+            player_dmg_taken
+        );
 
-impl Player {
-    pub fn new() -> Player {
-        Player {
-            strength: 10,
-            health: 100,
-        }
-    }
-}
-
-impl CanFight for Player {
-    fn attack(&self) -> u64 {
-        return self.strength;
+        gcd();
     }
 
-    fn defend(&mut self, damage: u64) -> u64 {
-        if damage >= self.health {
-            self.health = 1 // You can't die!
-        } else {
-            self.health = self.health - damage;
-        }
-
-        return self.health;
-    }
+    p.gain_exp(1);
 }
 
 fn main() {
     let mut p = Player::new();
 
     loop {
-        println!("New encounter!");
-        let mut m = Monster::new();
-
-        println!("Monster health: {}", m.health);
-        while m.defend(p.attack()) > 0 {
-            p.defend(m.attack());
-
-            println!("Player health: {}", p.health);
-            println!("Monster health: {}", m.health);
-            thread::sleep(TIMER);
-        }
+        battle(&mut p);
+        gcd();
     }
 }
