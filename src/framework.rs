@@ -3,3 +3,7 @@ pub trait CanFight {
     fn attack(&self) -> u64;
     fn defend(&mut self, damage: u64) -> (u64, bool); // damage taken, slain
 }
+
+pub trait Event {
+    fn turn(&mut self) -> Option<String>;
+}

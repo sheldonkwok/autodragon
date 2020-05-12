@@ -1,7 +1,7 @@
 use crate::player::Player;
 
 use crate::battle::monster::Monster;
-use crate::framework::CanFight;
+use crate::framework::{CanFight, Event};
 
 pub struct Battle<'a> {
     monster: Monster,
@@ -21,9 +21,8 @@ impl<'a> Battle<'a> {
     }
 }
 
-impl<'a> Iterator for Battle<'a> {
-    type Item = String;
-    fn next(&mut self) -> Option<Self::Item> {
+impl<'a> Event for Battle<'a> {
+    fn turn(&mut self) -> Option<String> {
         if self.finished {
             return None;
         }
